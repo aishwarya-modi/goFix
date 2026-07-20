@@ -137,31 +137,66 @@ function CodeHighlighter({ content, language }: { content: string; language: str
   );
 }
 
+const goKeywords = new Set(["package","import","func","type","struct","return","if","else","err","nil","defer","var","const","for","range","interface","map","make","new","error","fmt","log","strings","os","panic","db"]);
+
 function highlightLine(line: string, _language: string) {
-  const keywords = /\b(package|import|func|type|struct|return|if|else|err|nil|defer|var|const|for|range|interface|map|make|new|error|fmt|log|strings|os|panic|db)\b/g;
-  const strings = /(["'`])(.*?)\1/g;
-  const comments = /(\/\/.*$)/gm;
-  const numbers = /\b(\d+)\b/g;
+  const tokens: React.ReactNode[] = [];
+  let remaining = line;
+  let key = 0;
 
-  let result = line;
-  result = result.replace(
-    comments,
-    '<span class="text-zinc-500">$1</span>'
-  );
-  result = result.replace(
-    strings,
-    '<span class="text-emerald-400">$&</span>'
-  );
-  result = result.replace(
-    keywords,
-    '<span class="text-purple-400">$&</span>'
-  );
-  result = result.replace(
-    numbers,
-    '<span class="text-cyan-400">$1</span>'
-  );
+  while (remaining.length > 0) {
+    const commentIdx = remaining.indexOf("//");
 
-  return <span dangerouslySetInnerHTML={{ __html: result }} />;
+    let segment = commentIdx >= 0 ? remaining.slice(0, commentIdx) : remaining;
+    const comment = commentIdx >= 0 ? remaining.slice(commentIdx) : null;
+
+    const segmentTokens = tokenizeSegment(segment, key);
+    key += segmentTokens.length + 1;
+    tokens.push(...segmentTokens);
+
+    if (comment) {
+      tokens.push(<span key={key++} className="text-zinc-500">{comment}</span>);
+    }
+
+    remaining = "";
+  }
+
+  return <span>{tokens}</span>;
+}
+
+function tokenizeSegment(segment: string, startKey: number): React.ReactNode[] {
+  const tokens: React.ReactNode[] = [];
+  let key = startKey;
+  let rest = segment;
+
+  const pattern = /(["'`])(?:(?!\1|\\).|\\.)*?\1|\b([a-zA-Z_]\w*)\b|(\d+)/g;
+  let match: RegExpExecArray | null;
+  let lastIdx = 0;
+
+  while ((match = pattern.exec(rest)) !== null) {
+    if (match.index > lastIdx) {
+      tokens.push(<span key={key++}>{rest.slice(lastIdx, match.index)}</span>);
+    }
+
+    if (match[1] !== undefined) {
+      tokens.push(<span key={key++} className="text-emerald-400">{match[0]}</span>);
+    } else if (match[2] !== undefined) {
+      const cls = goKeywords.has(match[2]) ? "text-purple-400" : undefined;
+      tokens.push(cls
+        ? <span key={key++} className={cls}>{match[0]}</span>
+        : <span key={key++}>{match[0]}</span>);
+    } else if (match[3] !== undefined) {
+      tokens.push(<span key={key++} className="text-cyan-400">{match[0]}</span>);
+    }
+
+    lastIdx = match.index + match[0].length;
+  }
+
+  if (lastIdx < rest.length) {
+    tokens.push(<span key={key++}>{rest.slice(lastIdx)}</span>);
+  }
+
+  return tokens;
 }
 
 export default function ChallengePage() {
