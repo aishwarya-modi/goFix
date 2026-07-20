@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { runMigrations } from "@/lib/migrations/run";
 
 export async function POST(request: NextRequest) {
-  // Only allow in development
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Not available in production" }, { status: 403 });
+  const authHeader = request.headers.get("x-setup-key");
+  if (authHeader !== process.env.SETUP_KEY) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
