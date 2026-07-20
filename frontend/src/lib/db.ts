@@ -1,28 +1,21 @@
 import { Pool, PoolConfig } from "pg";
 
-// For serverless (Vercel), use short-lived pools per invocation
-// For long-running servers, use a persistent pool
 const isServerless = process.env.VERCEL === "1" || process.env.AWS_LAMBDA_FUNCTION_NAME;
 
-const poolConfig: PoolConfig = {
-  connectionString: process.env.DATABASE_URL,
-  max: isServerless ? 1 : 10,
-  idleTimeoutMillis: isServerless ? 0 : 30000,
-  connectionTimeoutMillis: 5000,
-  // SSL for production databases
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
-};
-
-// Use global to persist pool across hot reloads in dev (non-serverless only)
-const globalForDb = globalThis as unknown as { __pgPool: Pool | null };
-
 let pool: Pool | null = null;
+const globalForDb = globalThis as unknown as { __pgPool: Pool | null };
 
 function getPoolInstance(): Pool {
   if (isServerless) {
-    // In serverless, create a new pool per invocation (no persistence)
     if (!pool) {
-      pool = new Pool(poolConfig);
+      const config: PoolConfig = {
+        connectionString: process.env.DATABASE_URL,
+        max: 1,
+        idleTimeoutMillis: 0,
+        connectionTimeoutMillis: 5000,
+        ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+      };
+      pool = new Pool(config);
       pool.on("error", (err) => {
         console.error("[DB] Unexpected pool error:", err.message);
       });
@@ -30,9 +23,16 @@ function getPoolInstance(): Pool {
     return pool;
   }
 
-  // In standard server, persist via globalThis
   if (!globalForDb.__pgPool) {
-    globalForDb.__pgPool = new Pool(poolConfig);
+    const config: PoolConfig = {
+      connectionString: process.env.DATABASE_URL,
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+    };
+    console.log("[DB] Creating pool with DATABASE_URL:", process.env.DATABASE_URL ? "SET" : "UNSET");
+    globalForDb.__pgPool = new Pool(config);
     globalForDb.__pgPool.on("error", (err) => {
       console.error("[DB] Unexpected pool error:", err.message);
     });
