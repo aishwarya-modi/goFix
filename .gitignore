@@ -19,8 +19,8 @@ frontend/out/
 .env.local
 .env.*.local
 
-# Database data
-data/
+# Database data (PostgreSQL volume)
+/data/
 
 # IDE
 .vscode/
