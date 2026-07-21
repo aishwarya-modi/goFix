@@ -11,7 +11,10 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { cn } from "@/lib/utils";
-import { getTopicContent, TopicContent } from "@/lib/data/topic-content";
+import { getTopicContent } from "@/lib/data/topic-content";
+import { getQuestionsForTopic } from "@/lib/quiz/questions";
+import { useQuizStore } from "@/store/quiz";
+import { QuizEngine } from "@/components/quiz/QuizEngine";
 
 interface RoadmapTopic {
   id: number;
@@ -67,18 +70,13 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
   const { currentUser } = useAuthStore();
   const [topic, setTopic] = useState<RoadmapTopic | null>(null);
   const [progress, setProgress] = useState<TopicProgress | null>(null);
-  const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
-  const [quizStats, setQuizStats] = useState<QuizStats>({ total: 0, attempted: 0, correct: 0 });
+  const { startQuiz } = useQuizStore();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"content" | "quiz">("content");
-  const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [quizResults, setQuizResults] = useState<Record<number, { isCorrect: boolean; selectedIndex: number }>>({});
-  const [submitting, setSubmitting] = useState(false);
   const [expandedExample, setExpandedExample] = useState<number | null>(0);
 
   const content = getTopicContent(slug);
+  const questions = getQuestionsForTopic(slug);
 
   useEffect(() => {
     const fetchTopic = async () => {
@@ -89,20 +87,16 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
         setTopic(found || null);
 
         if (currentUser && found) {
-          const [progressRes, quizzesRes] = await Promise.all([
-            fetch(`/api/progress?userId=${currentUser.id}`),
-            fetch(`/api/quizzes?topic=${slug}&userId=${currentUser.id}`),
-          ]);
-
+          const progressRes = await fetch(`/api/progress?userId=${currentUser.id}`);
           const progressData = await progressRes.json();
           const topicProgress = progressData.progress?.find(
             (p: { topic_slug: string }) => p.topic_slug === slug
           );
           setProgress(topicProgress || { completed: false, bookmarked: false, notes: null });
-
-          const quizzesData = await quizzesRes.json();
-          setQuizzes(quizzesData.quizzes || []);
-          setQuizStats(quizzesData.stats || { total: 0, attempted: 0, correct: 0 });
+        }
+        
+        if (questions.length > 0) {
+            startQuiz(slug, questions);
         }
       } catch (error) {
         console.error("Failed to fetch topic:", error);
@@ -112,7 +106,7 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
     };
 
     fetchTopic();
-  }, [slug, currentUser]);
+  }, [slug, currentUser, questions, startQuiz]);
 
   const toggleComplete = async () => {
     if (!currentUser || !topic) return;
@@ -136,56 +130,6 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
     setProgress({ completed: progress?.completed || false, bookmarked: newBookmarked, notes: progress?.notes ?? null });
   };
 
-  const submitQuizAnswer = async () => {
-    if (!currentUser || selectedAnswer === null || !quizzes[currentQuizIndex]) return;
-    setSubmitting(true);
-    try {
-      const quiz = quizzes[currentQuizIndex];
-      const res = await fetch("/api/quizzes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: currentUser.id,
-          quizId: quiz.id,
-          selectedIndex: selectedAnswer,
-        }),
-      });
-      const data = await res.json();
-      setQuizResults((prev) => ({
-        ...prev,
-        [quiz.id]: { isCorrect: data.isCorrect, selectedIndex: selectedAnswer },
-      }));
-      setQuizStats(data.stats);
-      setShowExplanation(true);
-    } catch (error) {
-      console.error("Failed to submit quiz:", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const nextQuiz = () => {
-    if (currentQuizIndex < quizzes.length - 1) {
-      setCurrentQuizIndex((prev) => prev + 1);
-      setSelectedAnswer(null);
-      setShowExplanation(false);
-    }
-  };
-
-  const prevQuiz = () => {
-    if (currentQuizIndex > 0) {
-      setCurrentQuizIndex((prev) => prev - 1);
-      const prevQuizItem = quizzes[currentQuizIndex - 1];
-      if (quizResults[prevQuizItem.id]) {
-        setSelectedAnswer(quizResults[prevQuizItem.id].selectedIndex);
-        setShowExplanation(true);
-      } else {
-        setSelectedAnswer(null);
-        setShowExplanation(false);
-      }
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -206,9 +150,6 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
   }
 
   const meta = categoryMeta[topic.category] || { label: topic.category, color: "text-zinc-400", bg: "bg-zinc-500/10" };
-  const currentQuiz = quizzes[currentQuizIndex];
-  const quizResult = currentQuiz ? quizResults[currentQuiz.id] : null;
-  const quizCompleted = quizzes.length > 0 && quizzes.every((q) => quizResults[q.id]);
 
   return (
     <div className="min-h-[calc(100vh-4rem)]">
@@ -297,7 +238,7 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
             )}
           >
             <Brain className="mr-2 inline h-4 w-4" />
-            Quiz {quizzes.length > 0 && `(${quizStats.correct}/${quizzes.length})`}
+            Quiz {questions.length > 0 && `(${questions.length})`}
           </button>
         </div>
 
@@ -528,182 +469,15 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
               exit={{ opacity: 0, y: -10 }}
               className="mt-6"
             >
-              {quizzes.length === 0 ? (
+              {questions.length === 0 ? (
                 <div className="rounded-xl border border-white/[0.06] bg-[#0c0c12] p-12 text-center">
                   <Brain className="mx-auto h-12 w-12 text-zinc-600" />
                   <h3 className="mt-4 text-lg font-semibold text-white">No quizzes available</h3>
-                  <p className="mt-2 text-sm text-zinc-400">
-                    Quizzes for this topic are coming soon. Check back later!
-                  </p>
                 </div>
               ) : (
-                <div className="rounded-xl border border-white/[0.06] bg-[#0c0c12] p-6">
-                  {/* Quiz Header */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-zinc-500">
-                        Question {currentQuizIndex + 1} of {quizzes.length}
-                      </p>
-                      <div className="mt-1 flex items-center gap-2">
-                        <span className={cn(
-                          "rounded px-1.5 py-0.5 text-[10px] font-medium",
-                          currentQuiz?.difficulty === "beginner"
-                            ? "text-emerald-400 bg-emerald-500/10"
-                            : currentQuiz?.difficulty === "intermediate"
-                            ? "text-yellow-400 bg-yellow-500/10"
-                            : "text-red-400 bg-red-500/10"
-                        )}>
-                          {currentQuiz?.difficulty}
-                        </span>
-                        <span className="text-[10px] text-zinc-500">
-                          {quizStats.correct}/{quizStats.attempted} correct
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {quizzes.map((q, i) => (
-                        <div
-                          key={q.id}
-                          className={cn(
-                            "h-1.5 w-6 rounded-full",
-                            i === currentQuizIndex
-                              ? "bg-emerald-500"
-                              : quizResults[q.id]?.isCorrect
-                              ? "bg-emerald-500/50"
-                              : quizResults[q.id]
-                              ? "bg-red-500/50"
-                              : "bg-white/10"
-                          )}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Question */}
-                  <div className="mt-6">
-                    <p className="text-sm font-medium text-white">{currentQuiz?.question}</p>
-                  </div>
-
-                  {/* Options */}
-                  <div className="mt-4 space-y-2">
-                    {currentQuiz?.options.map((option, i) => {
-                      const isSelected = selectedAnswer === i;
-                      const isCorrect = quizResult && i === currentQuiz.correct_index;
-                      const isWrong = quizResult && isSelected && !quizResult.isCorrect;
-
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => !showExplanation && setSelectedAnswer(i)}
-                          disabled={showExplanation}
-                          className={cn(
-                            "w-full rounded-lg border p-3 text-left text-sm transition-all",
-                            showExplanation
-                              ? isCorrect
-                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                                : isWrong
-                                ? "border-red-500/30 bg-red-500/10 text-red-300"
-                                : "border-white/[0.06] bg-white/[0.02] text-zinc-500"
-                              : isSelected
-                              ? "border-purple-500/30 bg-purple-500/10 text-purple-300"
-                              : "border-white/[0.06] bg-white/[0.02] text-zinc-300 hover:border-white/10 hover:bg-white/[0.04]"
-                          )}
-                        >
-                          <span className="mr-3 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 text-[10px]">
-                            {String.fromCharCode(65 + i)}
-                          </span>
-                          {option}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Explanation */}
-                  <AnimatePresence>
-                    {showExplanation && currentQuiz && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="mt-4 overflow-hidden"
-                      >
-                        <div className={cn(
-                          "rounded-lg border p-4",
-                          quizResult?.isCorrect
-                            ? "border-emerald-500/20 bg-emerald-500/5"
-                            : "border-red-500/20 bg-red-500/5"
-                        )}>
-                          <div className="flex items-center gap-2">
-                            {quizResult?.isCorrect ? (
-                              <Trophy className="h-4 w-4 text-emerald-400" />
-                            ) : (
-                              <X className="h-4 w-4 text-red-400" />
-                            )}
-                            <span className={cn(
-                              "text-sm font-medium",
-                              quizResult?.isCorrect ? "text-emerald-400" : "text-red-400"
-                            )}>
-                              {quizResult?.isCorrect ? "Correct!" : "Incorrect"}
-                            </span>
-                          </div>
-                          <p className="mt-2 text-sm text-zinc-400">{currentQuiz.explanation}</p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Actions */}
-                  <div className="mt-6 flex items-center justify-between">
-                    <button
-                      onClick={prevQuiz}
-                      disabled={currentQuizIndex === 0}
-                      className="flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-300 disabled:opacity-30"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Previous
-                    </button>
-                    <div className="flex gap-2">
-                      {!showExplanation && selectedAnswer !== null && (
-                        <button
-                          onClick={submitQuizAnswer}
-                          disabled={submitting}
-                          className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 text-sm font-medium text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:opacity-50"
-                        >
-                          {submitting ? "Checking..." : "Submit Answer"}
-                        </button>
-                      )}
-                      {showExplanation && currentQuizIndex < quizzes.length - 1 && (
-                        <button
-                          onClick={nextQuiz}
-                          className="flex items-center gap-2 rounded-lg bg-white/5 border border-white/[0.06] px-4 py-2 text-sm font-medium text-zinc-300 transition-all hover:bg-white/10"
-                        >
-                          Next
-                          <ArrowRight className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Quiz Complete */}
-                  {quizCompleted && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-6 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 text-center"
-                    >
-                      <Trophy className="mx-auto h-8 w-8 text-emerald-400" />
-                      <p className="mt-2 text-sm font-medium text-emerald-400">
-                        Quiz Complete! {quizStats.correct}/{quizzes.length} correct
-                      </p>
-                      <p className="mt-1 text-xs text-zinc-500">
-                        {quizStats.correct === quizzes.length
-                          ? "Perfect score! You've mastered this topic."
-                          : "Review the explanations and try again to improve."}
-                      </p>
-                    </motion.div>
-                  )}
-                </div>
+                <QuizEngine />
               )}
+
             </motion.div>
           )}
         </AnimatePresence>
