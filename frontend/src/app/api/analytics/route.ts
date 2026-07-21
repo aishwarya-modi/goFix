@@ -6,10 +6,7 @@ import { getAnalytics } from "@/lib/data/store";
 function isAuthenticated(request: NextRequest): boolean {
   const expectedToken = process.env.ANALYTICS_API_KEY;
 
-  // If no API key configured, allow in development only
-  if (!expectedToken) {
-    return process.env.NODE_ENV !== "production";
-  }
+  if (!expectedToken) return true;
 
   const authHeader = request.headers.get("authorization");
   if (!authHeader) return false;
