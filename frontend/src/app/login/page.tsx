@@ -162,13 +162,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="mt-4 rounded-lg border border-white/[0.06] bg-[#0c0c12] p-4">
-          <p className="text-xs font-medium text-zinc-400">Demo Credentials</p>
-          <p className="mt-1 text-xs text-zinc-500">
-            Admin: <span className="text-zinc-300">admin@gofix.dev</span> / <span className="text-zinc-300">admin123</span>
-          </p>
-        </div>
-
         <p className="mt-4 text-center text-xs text-zinc-600">
           Login is optional. You can use GoFix without an account.
         </p>
