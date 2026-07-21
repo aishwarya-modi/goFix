@@ -734,7 +734,7 @@ export default function ChallengePage() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <h3 className="text-base font-bold text-white">{currentTask.title}</h3>
+            <h3 className="text-base font-extrabold tracking-tight text-white">{currentTask.title}</h3>
             <p className="mt-2 text-sm text-zinc-400">{currentTask.description}</p>
             <div className="mt-4 space-y-2">
               {currentTask.hints.map((hint) => {

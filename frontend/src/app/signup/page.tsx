@@ -81,9 +81,9 @@ export default function SignupPage() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500">
             <Code2 className="h-6 w-6 text-black" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold text-white">Create your account</h1>
+          <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-white">Create your <span className="text-gradient-hero">account</span></h1>
           <p className="mt-2 text-sm text-zinc-400">
-            Join GoFix and start mastering Go backend engineering
+            Join GoFix and start mastering <span className="font-semibold text-emerald-400">Go backend engineering</span>
           </p>
         </div>
 

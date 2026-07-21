@@ -182,7 +182,7 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
                   {topic.difficulty}
                 </span>
               </div>
-              <h1 className="mt-3 text-2xl font-bold text-white">{content?.title || topic.title}</h1>
+              <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-white">{content?.title || topic.title}</h1>
               <p className="mt-2 text-sm text-zinc-400">{content?.summary}</p>
             </div>
             {currentUser && (
@@ -257,7 +257,7 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
                   {/* Description */}
                   <section className="rounded-xl border border-white/[0.06] bg-[#0c0c12] p-6">
                     <h2 className="text-lg font-semibold text-white">
-                      What is {content.title}?
+                      What is <span className="text-gradient-green">{content.title}</span>?
                     </h2>
                     <p className="mt-3 text-sm leading-relaxed text-zinc-400 whitespace-pre-line">
                       {content.description}
@@ -266,7 +266,7 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
 
                   {/* Key Points */}
                   <section className="rounded-xl border border-white/[0.06] bg-[#0c0c12] p-6">
-                    <h2 className="text-lg font-semibold text-white">Key Points</h2>
+                    <h2 className="text-lg font-extrabold tracking-tight text-white">Key <span className="text-gradient-cyan">Points</span></h2>
                     <ul className="mt-4 space-y-3">
                       {content.keyPoints.map((point, i) => (
                         <li key={i} className="flex items-start gap-3">
@@ -345,7 +345,7 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
 
                   {/* Best Practices */}
                   <section className="rounded-xl border border-white/[0.06] bg-[#0c0c12] p-6">
-                    <h2 className="text-lg font-semibold text-white">Best Practices</h2>
+                    <h2 className="text-lg font-extrabold tracking-tight text-white">Best <span className="text-gradient-green">Practices</span></h2>
                     <ul className="mt-4 space-y-3">
                       {content.bestPractices.map((practice, i) => (
                         <li key={i} className="flex items-start gap-3">
@@ -361,7 +361,7 @@ export default function TopicPage({ params }: { params: Promise<{ topic: string 
                     <section className="rounded-xl border border-red-500/10 bg-red-500/[0.03] p-6">
                       <h2 className="text-lg font-semibold text-red-400">
                         <AlertTriangle className="mr-2 inline h-5 w-5" />
-                        Common Mistakes
+                        <span className="font-extrabold tracking-tight">Common <span className="text-red-300">Mistakes</span></span>
                       </h2>
                       <ul className="mt-4 space-y-3">
                         {content.commonMistakes.map((mistake, i) => (

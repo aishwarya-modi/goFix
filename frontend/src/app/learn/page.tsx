@@ -130,9 +130,12 @@ export default function LearnPage() {
         {/* Page Title & Navigation Tabs */}
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white">Go Mastery Hub</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">
+              Go <span className="text-gradient-hero">Mastery Hub</span>
+            </h1>
             <p className="mt-1 text-sm text-zinc-400">
-              Master Go from syntax fundamentals to advanced backend cloud-native architecture.
+              Master Go from <span className="font-semibold text-emerald-400">syntax fundamentals</span> to{" "}
+              <em className="text-zinc-300">advanced backend cloud-native architecture</em>.
             </p>
           </div>
 
@@ -186,7 +189,7 @@ export default function LearnPage() {
                         <Target className="h-6 w-6" />
                       </div>
                       <div>
-                        <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Total Progress</p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider font-bold">Total Progress</p>
                         <p className="text-lg font-extrabold text-white">{completedCount}/{totalTopics} topics</p>
                       </div>
                     </div>
@@ -291,7 +294,7 @@ export default function LearnPage() {
                               {meta.icon}
                             </div>
                             <div>
-                              <h2 className="text-base font-bold text-white">{meta.label}</h2>
+                              <h2 className="text-base font-extrabold tracking-tight text-white">{meta.label}</h2>
                               <p className="text-xs text-zinc-500">
                                 {completedInCategory} of {catTopics.length} completed
                               </p>
@@ -374,7 +377,7 @@ export default function LearnPage() {
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <p className="text-xs font-semibold tracking-wider text-emerald-400 uppercase">Go Mastery Rank</p>
-                        <h3 className="text-2xl font-black text-white">{stats.levelTitle}</h3>
+                        <h3 className="text-2xl font-black tracking-tight text-white">{stats.levelTitle}</h3>
                         <p className="text-xs text-zinc-400">Level {stats.level} developer</p>
                       </div>
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/10">
@@ -442,7 +445,7 @@ export default function LearnPage() {
                 <Card className="border border-white/[0.06] bg-[#0c0c12] p-6 shadow-xl">
                   <div className="flex items-center justify-between border-b border-white/[0.04] pb-4 mb-6">
                     <div>
-                      <h3 className="text-base font-bold text-white">Milestone Achievements</h3>
+                      <h3 className="text-base font-extrabold tracking-tight text-white">Milestone <span className="text-gradient-amber">Achievements</span></h3>
                       <p className="text-xs text-zinc-500">Unlock certifications and digital trophies</p>
                     </div>
                     <span className="rounded-lg bg-white/5 px-2.5 py-1 text-xs font-bold text-zinc-300 border border-white/[0.04]">
@@ -483,7 +486,7 @@ export default function LearnPage() {
                 <Card className="border border-white/[0.06] bg-[#0c0c12] p-6 shadow-xl">
                   <div className="flex items-center justify-between border-b border-white/[0.04] pb-4 mb-6">
                     <div>
-                      <h3 className="text-base font-bold text-white">Recent Quiz Activity</h3>
+                      <h3 className="text-base font-extrabold tracking-tight text-white">Recent Quiz <span className="text-gradient-cyan">Activity</span></h3>
                       <p className="text-xs text-zinc-500">History of your knowledge checks</p>
                     </div>
                   </div>

@@ -83,8 +83,10 @@ export function QuizEngine() {
     return (
       <div className="flex h-64 flex-col items-center justify-center text-center">
         <AlertCircle className="h-10 w-10 text-zinc-500" />
-        <h3 className="mt-4 text-sm font-semibold text-white">No active quiz session</h3>
-        <p className="mt-1 text-xs text-zinc-500">Go to any roadmap topic and open the Quiz tab to start.</p>
+            <h3 className="mt-4 text-sm font-extrabold tracking-tight text-white">No active quiz session</h3>
+            <p className="mt-1 text-xs text-zinc-500">
+              Go to any roadmap topic and open the <span className="font-semibold text-emerald-400">Quiz tab</span> to start.
+            </p>
       </div>
     );
   }
@@ -276,7 +278,7 @@ export function QuizEngine() {
               <Card className="border border-emerald-500/10 bg-emerald-500/[0.02] p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Award className="h-5 w-5 text-emerald-400" />
-                  <h4 className="text-sm font-semibold text-emerald-400">Knowledge Check Explanation</h4>
+                  <h4 className="text-sm font-extrabold tracking-tight text-emerald-400">Knowledge Check <span className="text-emerald-300">Explanation</span></h4>
                 </div>
                 <p className="text-sm text-zinc-300 leading-relaxed">
                   {question.explanation}

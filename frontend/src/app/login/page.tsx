@@ -80,9 +80,9 @@ export default function LoginPage() {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-500">
             <Code2 className="h-6 w-6 text-black" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold text-white">Welcome back</h1>
+          <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-white">Welcome <span className="text-gradient-green">back</span></h1>
           <p className="mt-2 text-sm text-zinc-400">
-            Sign in to continue your Go learning journey
+            Sign in to continue your <span className="font-semibold text-emerald-400">Go learning journey</span>
           </p>
         </div>
 

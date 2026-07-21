@@ -77,8 +77,10 @@ export function ResultsScreen({ attempt, questions, onRetry, onBack, onPracticeW
             <Trophy className="h-8 w-8" />
           </div>
 
-          <h2 className="mt-4 text-2xl font-bold tracking-tight text-white">Quiz Completed!</h2>
-          <p className="mt-1 text-sm text-zinc-400">Great effort preparing for your Go backend interview.</p>
+          <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-white">Quiz <span className="text-gradient-green">Completed!</span></h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Great effort preparing for your <span className="font-semibold text-emerald-400">Go backend</span> interview.
+          </p>
 
           <div className="mt-6 flex items-baseline justify-center gap-1">
             <span className={`text-6xl font-extrabold tracking-tight ${grade.color}`}>{grade.grade}</span>
@@ -118,7 +120,7 @@ export function ResultsScreen({ attempt, questions, onRetry, onBack, onPracticeW
 
       {/* Review Mode Panel */}
       <Card className="border border-white/[0.08] bg-[#0c0c12] p-6">
-        <h3 className="text-sm font-semibold text-white mb-4">Question Review</h3>
+        <h3 className="text-sm font-extrabold tracking-tight text-white mb-4">Question <span className="text-gradient-cyan">Review</span></h3>
         <div className="space-y-4">
           {questions.map((q, idx) => {
             const userAnswer = attempt.answers[q.id];

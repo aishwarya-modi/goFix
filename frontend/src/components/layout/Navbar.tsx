@@ -29,8 +29,8 @@ export function Navbar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500">
               <Code2 className="h-4 w-4 text-black" />
             </div>
-            <span className="text-lg font-bold tracking-tight text-white">
-              Go<span className="text-emerald-400">Fix</span>
+            <span className="text-lg font-extrabold tracking-tight text-white">
+              Go<span className="text-gradient-green">Fix</span>
             </span>
           </Link>
 

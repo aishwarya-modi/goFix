@@ -119,16 +119,17 @@ export default function HomePage() {
             </span>
           </div>
 
-          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="heading-display">
             <span className="text-white">Go Backend</span>
             <br />
-            <span className="gradient-text">Interview Challenge</span>
+            <span className="text-gradient-hero animate-text-glow">Interview Challenge</span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
-            A deliberately flawed Go backend project. Your mission: identify
-            security vulnerabilities, fix architectural issues, and learn Go
-            best practices — hands-on.
+            A <span className="Emphasis">deliberately flawed</span> Go backend project. Your mission: identify{" "}
+            <span className="highlight-red">security vulnerabilities</span>, fix{" "}
+            <span className="highlight-amber">architectural issues</span>, and learn Go{" "}
+            <span className="highlight">best practices</span> — <em className="text-zinc-300">hands-on</em>.
           </p>
 
           <div className="mt-8 flex items-center justify-center gap-4">
@@ -183,17 +184,18 @@ export default function HomePage() {
           <div className="flex flex-col items-start gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <h2 className="text-2xl font-bold text-white">
-                  Simple User Service
+                <h2 className="text-2xl font-extrabold tracking-tight text-white">
+                  Simple <span className="text-gradient-green">User Service</span>
                 </h2>
-                <span className="rounded-md bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 text-xs font-medium text-yellow-400">
+                <span className="rounded-md bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-yellow-400">
                   Mid-Level
                 </span>
               </div>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-400">
-                This API allows users to register. However, the project contains
-                multiple intentional production issues. Your task is to identify
-                them and improve the application.
+                This API allows users to register. However, the project contains{" "}
+                <span className="Emphasis">multiple intentional production issues</span>.
+                Your task is to <span className="highlight">identify them</span> and{" "}
+                <span className="highlight">improve the application</span>.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2">
@@ -253,12 +255,12 @@ export default function HomePage() {
           className="mt-16"
           data-tour="tour-features"
         >
-          <h2 className="text-center text-2xl font-bold text-white">
-            Platform Features
+          <h2 className="heading-section text-center text-white">
+            Platform <span className="text-gradient-cyan">Features</span>
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-center text-sm text-zinc-500">
-            Everything you need to practice backend engineering skills in a
-            hands-on environment.
+            Everything you need to practice <span className="font-semibold text-zinc-300">backend engineering</span> skills in a{" "}
+            <em className="text-zinc-400">hands-on environment</em>.
           </p>
 
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -294,8 +296,8 @@ export default function HomePage() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="mt-16 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8"
         >
-          <h2 className="text-xl font-bold text-white">
-            Expected Skills After Completion
+          <h2 className="text-xl font-extrabold tracking-tight text-white">
+            Expected Skills <span className="text-gradient-amber">After Completion</span>
           </h2>
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[
